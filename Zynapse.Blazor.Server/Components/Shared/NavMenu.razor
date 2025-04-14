@@ -1,0 +1,71 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Zynapse.Blazor.Server.Services
+@inject FirebaseAuthService AuthService
+@inject FirebaseAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Zynapse</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <div class="d-flex align-items-center">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="dropdown">
+                            <button class="btn btn-link nav-link dropdown-toggle" @onclick="ToggleDropdown">
+                                @(context.User.Identity?.Name ?? "User")
+                            </button>
+                            @if (IsDropdownOpen)
+                            {
+                                <div class="dropdown-menu show">
+                                    <a class="dropdown-item" href="/profile">Profile</a>
+                                    <a class="dropdown-item" href="#" @onclick="HandleLogout">Logout</a>
+                                </div>
+                            }
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="nav-link" href="/login">Login</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+        <div class="nav-item px-3">
+            <a class="nav-link" href="/">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </a>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool IsDropdownOpen = false;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void ToggleDropdown()
+    {
+        IsDropdownOpen = !IsDropdownOpen;
+    }
+
+    private async Task HandleLogout()
+    {
+        AuthService.SignOut();
+        AuthStateProvider.NotifyStateChanged();
+        NavigationManager.NavigateTo("/");
+    }
+} 

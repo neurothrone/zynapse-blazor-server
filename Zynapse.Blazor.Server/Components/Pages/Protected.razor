@@ -1,0 +1,30 @@
+@page "/protected"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+<PageTitle>Protected Page</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Protected Content</h3>
+                </div>
+                <div class="card-body">
+                    <p>This page is protected and can only be accessed by authenticated users.</p>
+                    <p>Your email: @context.User.FindFirst(ClaimTypes.Email)?.Value</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private AuthenticationState context => authenticationState?.Result ?? new AuthenticationState(new ClaimsPrincipal());
+} 

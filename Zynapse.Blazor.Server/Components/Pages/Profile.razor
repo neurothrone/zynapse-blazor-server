@@ -1,0 +1,76 @@
+@page "/profile"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Zynapse.Blazor.Server.Models
+@using Zynapse.Blazor.Server.Services
+@attribute [Authorize]
+
+<PageTitle>Profile - Zynapse</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Profile Information</h3>
+                </div>
+                <div class="card-body">
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (_user != null)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="text" class="form-control" value="@_user.Email" readonly/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="form-control" value="@_user.DisplayName" readonly/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Last Sign In</label>
+                                    <input type="text" class="form-control"
+                                           value="@_user.LastSignInTimestamp?.ToLocalTime().ToString()" readonly/>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">
+                                    Loading profile information...
+                                </div>
+                            }
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="alert alert-warning">
+                                You must be logged in to view this page.
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private FirebaseUser? _user;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [Inject]
+    private FirebaseAuthService AuthService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState != null)
+        {
+            var authState = await AuthenticationState;
+            if (authState?.User?.Identity?.IsAuthenticated == true)
+            {
+                _user = await AuthService.GetCurrentUserAsync();
+            }
+        }
+    }
+
+} 
