@@ -5,7 +5,7 @@ namespace Zynapse.Blazor.Server.Services;
 
 public class FirebaseAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+    private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
     private ClaimsPrincipal? _currentUser;
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -23,4 +23,4 @@ public class FirebaseAuthenticationStateProvider : AuthenticationStateProvider
     {
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
-} 
+}
