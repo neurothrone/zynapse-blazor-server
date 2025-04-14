@@ -12,8 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<FirebaseAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
-    sp.GetRequiredService<FirebaseAuthenticationStateProvider>()
-);
+    sp.GetRequiredService<FirebaseAuthenticationStateProvider>());
 
 // Add authentication services
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -30,27 +29,24 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // Configure Firebase
-var firebaseConfigPath = Path.Combine(builder.Environment.ContentRootPath, "firebase-service-account.json");
-if (!File.Exists(firebaseConfigPath))
+var firebaseConfig = builder.Configuration.GetSection("Firebase");
+var apiKey = firebaseConfig["ApiKey"];
+var authDomain = firebaseConfig["AuthDomain"];
+
+if (string.IsNullOrEmpty(apiKey))
 {
-    throw new InvalidOperationException(
-        "Firebase service account file not found. Please follow these steps:\n" +
-        "1. Go to Firebase Console → Project Settings → Service Accounts\n" +
-        "2. Click 'Generate New Private Key'\n" +
-        "3. Save the downloaded JSON file as 'firebase-service-account.json' in the project root"
-    );
+    throw new Exception("Firebase API key is not configured");
 }
 
-var firebaseConfigJson = await File.ReadAllTextAsync(firebaseConfigPath);
+if (string.IsNullOrEmpty(authDomain))
+{
+    throw new Exception("Firebase Auth Domain is not configured");
+}
 
-// Register Firebase services
-builder.Services.AddScoped<FirebaseAuthService>(sp =>
-    new FirebaseAuthService(
-        firebaseConfigJson,
-        sp.GetRequiredService<ILogger<FirebaseAuthService>>(),
-        sp.GetRequiredService<FirebaseAuthenticationStateProvider>()
-    )
-);
+builder.Services.AddScoped(provider => new FirebaseAuthService(
+    provider.GetRequiredService<ILogger<FirebaseAuthService>>(),
+    provider.GetRequiredService<FirebaseAuthenticationStateProvider>(),
+    provider.GetRequiredService<IConfiguration>()));
 
 // Add authorization
 builder.Services.AddAuthorization();

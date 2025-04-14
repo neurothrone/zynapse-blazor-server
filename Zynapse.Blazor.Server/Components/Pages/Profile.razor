@@ -32,6 +32,10 @@
                                     <input type="text" class="form-control"
                                            value="@_user.LastSignInTimestamp?.ToLocalTime().ToString()" readonly/>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email Verified</label>
+                                    <input type="text" class="form-control" value="@_user.EmailVerified" readonly/>
+                                </div>
                             }
                             else
                             {
@@ -55,22 +59,15 @@
 @code {
     private FirebaseUser? _user;
 
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
-
     [Inject]
     private FirebaseAuthService AuthService { get; set; } = default!;
 
+    [Inject]
+    private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationState != null)
-        {
-            var authState = await AuthenticationState;
-            if (authState?.User?.Identity?.IsAuthenticated == true)
-            {
-                _user = await AuthService.GetCurrentUserAsync();
-            }
-        }
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        _user = await AuthService.GetCurrentUserAsync(authState.User);
     }
-
 } 

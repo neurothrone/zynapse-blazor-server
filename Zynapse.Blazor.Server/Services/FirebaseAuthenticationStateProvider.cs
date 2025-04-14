@@ -16,7 +16,7 @@ public class FirebaseAuthenticationStateProvider : AuthenticationStateProvider
     public void SetUser(ClaimsPrincipal? user)
     {
         _currentUser = user;
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        NotifyStateChanged();
     }
 
     public void NotifyStateChanged()
