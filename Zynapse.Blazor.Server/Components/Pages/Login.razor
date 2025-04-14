@@ -1,5 +1,4 @@
 @page "/login"
-@using FirebaseAdmin.Auth
 @using Microsoft.AspNetCore.Components.Authorization
 @using Zynapse.Blazor.Server.Services
 @inject FirebaseAuthService AuthService
@@ -63,11 +62,11 @@
 
         try
         {
-            var auth = FirebaseAuth.DefaultInstance;
-            var userRecord = await auth.GetUserByEmailAsync(Email);
-            await AuthService.SetAuthCookie(userRecord.Uid);
-            AuthStateProvider.NotifyStateChanged();
-            NavigationManager.NavigateTo("/profile", replace: true);
+            if (await AuthService.SignInWithEmailAndPasswordAsync(Email, Password))
+            {
+                AuthStateProvider.NotifyStateChanged();
+                NavigationManager.NavigateTo("/profile", replace: true);
+            }
         }
         catch (Exception ex)
         {
@@ -87,16 +86,11 @@
 
         try
         {
-            var auth = FirebaseAuth.DefaultInstance;
-            var userRecord = await auth.CreateUserAsync(new UserRecordArgs
+            if (await AuthService.CreateUserWithEmailAndPasswordAsync(Email, Password))
             {
-                Email = Email,
-                Password = Password,
-                EmailVerified = false
-            });
-            await AuthService.SetAuthCookie(userRecord.Uid);
-            AuthStateProvider.NotifyStateChanged();
-            NavigationManager.NavigateTo("/profile", replace: true);
+                AuthStateProvider.NotifyStateChanged();
+                NavigationManager.NavigateTo("/profile", replace: true);
+            }
         }
         catch (Exception ex)
         {

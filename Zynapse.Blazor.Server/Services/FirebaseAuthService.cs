@@ -26,7 +26,7 @@ public class FirebaseAuthService
         }
     }
 
-    public async Task<string> SignInWithEmailAndPasswordAsync(string email, string password)
+    public async Task<bool> SignInWithEmailAndPasswordAsync(string email, string password)
     {
         try
         {
@@ -35,16 +35,29 @@ public class FirebaseAuthService
             
             // Create a custom token for the user
             var customToken = await auth.CreateCustomTokenAsync(userRecord.Uid);
-            return customToken;
+            
+            // Set up the authentication state
+            await SetAuthCookie(userRecord.Uid);
+            return true;
+        }
+        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+        {
+            _logger.LogWarning("User not found: {Email}", email);
+            throw new Exception("Invalid email or password");
+        }
+        catch (FirebaseAuthException ex)
+        {
+            _logger.LogError(ex, "Firebase authentication error for user: {Email}", email);
+            throw new Exception("Authentication failed. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error signing in with email and password");
-            throw;
+            throw new Exception("An unexpected error occurred. Please try again.");
         }
     }
 
-    public async Task<string> CreateUserWithEmailAndPasswordAsync(string email, string password)
+    public async Task<bool> CreateUserWithEmailAndPasswordAsync(string email, string password)
     {
         try
         {
@@ -56,17 +69,28 @@ public class FirebaseAuthService
                 EmailVerified = false
             });
 
-            var customToken = await auth.CreateCustomTokenAsync(userRecord.Uid);
-            return customToken;
+            // Set up the authentication state
+            await SetAuthCookie(userRecord.Uid);
+            return true;
+        }
+        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.EmailAlreadyExists)
+        {
+            _logger.LogWarning("Email already exists: {Email}", email);
+            throw new Exception("An account with this email already exists.");
+        }
+        catch (FirebaseAuthException ex)
+        {
+            _logger.LogError(ex, "Firebase authentication error creating user: {Email}", email);
+            throw new Exception("Failed to create account. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating user with email and password");
-            throw;
+            throw new Exception("An unexpected error occurred. Please try again.");
         }
     }
 
-    public async Task SetAuthCookie(string uid)
+    private async Task SetAuthCookie(string uid)
     {
         try
         {
