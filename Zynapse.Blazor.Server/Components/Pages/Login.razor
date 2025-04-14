@@ -1,4 +1,5 @@
 @page "/login"
+@using FirebaseAdmin.Auth
 @using Microsoft.AspNetCore.Components.Authorization
 @using Zynapse.Blazor.Server.Services
 @inject FirebaseAuthService AuthService
@@ -62,8 +63,9 @@
 
         try
         {
-            var token = await AuthService.SignInWithEmailAndPasswordAsync(Email, Password);
-            await AuthService.SetAuthCookie(token);
+            var auth = FirebaseAuth.DefaultInstance;
+            var userRecord = await auth.GetUserByEmailAsync(Email);
+            await AuthService.SetAuthCookie(userRecord.Uid);
             AuthStateProvider.NotifyStateChanged();
             NavigationManager.NavigateTo("/profile", replace: true);
         }
@@ -85,8 +87,14 @@
 
         try
         {
-            var token = await AuthService.CreateUserWithEmailAndPasswordAsync(Email, Password);
-            await AuthService.SetAuthCookie(token);
+            var auth = FirebaseAuth.DefaultInstance;
+            var userRecord = await auth.CreateUserAsync(new UserRecordArgs
+            {
+                Email = Email,
+                Password = Password,
+                EmailVerified = false
+            });
+            await AuthService.SetAuthCookie(userRecord.Uid);
             AuthStateProvider.NotifyStateChanged();
             NavigationManager.NavigateTo("/profile", replace: true);
         }

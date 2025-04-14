@@ -33,7 +33,7 @@ public class FirebaseAuthService
             var auth = FirebaseAuth.DefaultInstance;
             var userRecord = await auth.GetUserByEmailAsync(email);
             
-            // Verify the password
+            // Create a custom token for the user
             var customToken = await auth.CreateCustomTokenAsync(userRecord.Uid);
             return customToken;
         }
@@ -66,13 +66,12 @@ public class FirebaseAuthService
         }
     }
 
-    public async Task SetAuthCookie(string token)
+    public async Task SetAuthCookie(string uid)
     {
         try
         {
             var auth = FirebaseAuth.DefaultInstance;
-            var decodedToken = await auth.VerifyIdTokenAsync(token);
-            var user = await auth.GetUserAsync(decodedToken.Uid);
+            var user = await auth.GetUserAsync(uid);
             
             var claims = new List<Claim>
             {
