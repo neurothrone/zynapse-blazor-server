@@ -2,7 +2,6 @@
 @using Zynapse.Blazor.Server.Services
 @inject NavigationManager NavigationManager
 @inject FirebaseAuthService AuthService
-@inject FirebaseAuthenticationStateProvider AuthStateProvider
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -28,9 +27,10 @@
                     </a>
                 </div>
                 <div class="nav-item px-3">
-                    <a class="nav-link" @onclick="HandleLogout">
-                        <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
-                    </a>
+
+                    <form method="post" action="/logout-user">
+                        <button type="submit" class="nav-link btn btn-link">Logout</button>
+                    </form>
                 </div>
             </Authorized>
             <NotAuthorized>
@@ -54,10 +54,4 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
-    private void HandleLogout()
-    {
-        AuthService.SignOut();
-        AuthStateProvider.NotifyStateChanged();
-        NavigationManager.NavigateTo("/");
-    }
-} 
+}

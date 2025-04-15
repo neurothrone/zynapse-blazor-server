@@ -1,8 +1,8 @@
 @page "/login"
+@using Microsoft.AspNetCore.Antiforgery
 @using Zynapse.Blazor.Server.Services
 @inject FirebaseAuthService AuthService
 @inject NavigationManager NavigationManager
-@inject FirebaseAuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login - Zynapse</PageTitle>
 
@@ -14,24 +14,20 @@
                     <h3>Login</h3>
                 </div>
                 <div class="card-body">
-                    @if (!string.IsNullOrEmpty(error))
-                    {
-                        <div class="alert alert-danger">
-                            @error
+                    <form method="post" action="/login-user">
+                        <input name="__RequestVerificationToken" type="hidden" value="@_requestToken"/>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="Email" class="form-control" id="email" required/>
                         </div>
-                    }
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" @bind="email" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" @bind="password" />
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary" @onclick="HandleLogin">Login</button>
-                        <button class="btn btn-secondary" @onclick="HandleCreateAccount">Create Account</button>
-                    </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="Password" class="form-control" id="password" required/>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" type="submit">Login</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -39,51 +35,19 @@
 </div>
 
 @code {
-    private string email = string.Empty;
-    private string password = string.Empty;
-    private string error = string.Empty;
 
-    private async Task HandleLogin()
+    [Inject]
+    private IAntiforgery Antiforgery { get; set; } = default!;
+
+    [Inject]
+    private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
+
+    private string? _requestToken;
+
+    protected override void OnInitialized()
     {
-        try
-        {
-            error = string.Empty;
-            var success = await AuthService.SignInWithEmailAndPasswordAsync(email, password);
-            if (success)
-            {
-                AuthStateProvider.NotifyStateChanged();
-                NavigationManager.NavigateTo("/profile", replace: true);
-            }
-            else
-            {
-                error = "Invalid email or password. Please try again or create an account.";
-            }
-        }
-        catch (Exception ex)
-        {
-            error = $"An error occurred: {ex.Message}";
-        }
+        var tokens = Antiforgery.GetAndStoreTokens(HttpContextAccessor.HttpContext!);
+        _requestToken = tokens.RequestToken;
     }
 
-    private async Task HandleCreateAccount()
-    {
-        try
-        {
-            error = string.Empty;
-            var success = await AuthService.CreateUserWithEmailAndPasswordAsync(email, password);
-            if (success)
-            {
-                AuthStateProvider.NotifyStateChanged();
-                NavigationManager.NavigateTo("/profile", replace: true);
-            }
-            else
-            {
-                error = "Failed to create account. The email might already be in use.";
-            }
-        }
-        catch (Exception ex)
-        {
-            error = $"An error occurred: {ex.Message}";
-        }
-    }
-} 
+}
