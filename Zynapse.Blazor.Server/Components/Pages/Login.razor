@@ -24,12 +24,12 @@
                                 @_errorMessage
                             </div>
                         }
-                        
+
                         <input name="__RequestVerificationToken" type="hidden" value="@_requestToken"/>
-                        
+
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" name="Email" class="form-control" required value="@_loginModel.Email" 
+                            <input type="email" id="email" name="Email" class="form-control" required value="@_loginModel.Email"
                                    @onchange="@(e => _loginModel.Email = e.Value?.ToString() ?? string.Empty)" />
                         </div>
                         <div class="mb-3">
@@ -53,7 +53,7 @@
 @code {
     private LoginModel _loginModel = new();
     private string? _errorMessage;
-    
+
     [Inject]
     private IAntiforgery Antiforgery { get; set; } = default!;
 
@@ -66,7 +66,7 @@
     {
         var tokens = Antiforgery.GetAndStoreTokens(HttpContextAccessor.HttpContext!);
         _requestToken = tokens.RequestToken;
-        
+
         // Check if the URL has an error parameter
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("error", out var errorValue))
