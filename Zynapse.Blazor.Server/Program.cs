@@ -4,6 +4,7 @@ using Zynapse.Blazor.Server.Components;
 using Zynapse.Blazor.Server.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Web;
+using Zynapse.Blazor.Server.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,87 +60,7 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-app.MapPost("/register-user", async (
-    HttpContext context,
-    IAntiforgery antiforgery,
-    FirebaseAuthService authService) =>
-{
-    try
-    {
-        await antiforgery.ValidateRequestAsync(context);
-    }
-    catch (AntiforgeryValidationException)
-    {
-        return Results.Redirect("/register?error=Invalid+or+missing+antiforgery+token");
-    }
-
-    var form = await context.Request.ReadFormAsync();
-    var email = form["Email"];
-    var password = form["Password"];
-    var confirmPassword = form["ConfirmPassword"];
-
-    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword))
-    {
-        return Results.Redirect("/register?error=Email,+password,+and+confirm+password+are+required");
-    }
-
-    if (password != confirmPassword)
-    {
-        return Results.Redirect("/register?error=Passwords+do+not+match");
-    }
-
-    var (success, errorMessage) = 
-        await authService.CreateUserWithEmailAndPasswordAsync(email!, password!);
-
-    if (!success)
-    {
-        var encodedError = HttpUtility.UrlEncode(errorMessage ?? "Account registration failed");
-        return Results.Redirect($"/register?error={encodedError}");
-    }
-    
-    return Results.Redirect("/profile");
-});
-
-app.MapPost("/login-user", async (
-    HttpContext context,
-    IAntiforgery antiforgery,
-    FirebaseAuthService authService) =>
-{
-    try
-    {
-        await antiforgery.ValidateRequestAsync(context);
-    }
-    catch (AntiforgeryValidationException)
-    {
-        return Results.Redirect("/login?error=Invalid+or+missing+antiforgery+token");
-    }
-
-    var form = await context.Request.ReadFormAsync();
-    var email = form["Email"];
-    var password = form["Password"];
-
-    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-    {
-        return Results.Redirect("/login?error=Email+and+password+are+required");
-    }
-
-    var (success, errorMessage) =
-        await authService.SignInWithEmailAndPasswordAsync(email!, password!);
-
-    if (!success)
-    {
-        var encodedError = HttpUtility.UrlEncode(errorMessage ?? "Invalid credentials");
-        return Results.Redirect($"/login?error={encodedError}");
-    }
-    
-    return Results.Redirect("/profile");
-});
-
-app.MapPost("/logout-user", async (HttpContext context) =>
-{
-    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    return Results.Redirect("/");
-});
+app.MapAuthEndpoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
