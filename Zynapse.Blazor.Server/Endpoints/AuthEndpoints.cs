@@ -13,11 +13,12 @@ public static class AuthEndpoints
     {
         var group = endpoints.MapGroup("/api/auth");
 
-        group.MapPost("/register", [IgnoreAntiforgeryToken] async (
+        group.MapPost("/register", async (
             FirebaseAuthService authService,
             [FromForm] RegisterModel model) =>
         {
-            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.ConfirmPassword))
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) ||
+                string.IsNullOrEmpty(model.ConfirmPassword))
             {
                 return Results.Redirect("/register?error=Email,+password,+and+confirm+password+are+required");
             }
@@ -27,7 +28,7 @@ public static class AuthEndpoints
                 return Results.Redirect("/register?error=Passwords+do+not+match");
             }
 
-            var (success, errorMessage) = 
+            var (success, errorMessage) =
                 await authService.CreateUserWithEmailAndPasswordAsync(model.Email, model.Password);
 
             if (!success)
@@ -35,11 +36,11 @@ public static class AuthEndpoints
                 var encodedError = HttpUtility.UrlEncode(errorMessage ?? "Account registration failed");
                 return Results.Redirect($"/register?error={encodedError}");
             }
-            
+
             return Results.Redirect("/profile");
         });
 
-        group.MapPost("/login", [IgnoreAntiforgeryToken] async (
+        group.MapPost("/login", async (
             FirebaseAuthService authService,
             [FromForm] LoginModel model) =>
         {
@@ -56,14 +57,14 @@ public static class AuthEndpoints
                 var encodedError = HttpUtility.UrlEncode(errorMessage ?? "Invalid credentials");
                 return Results.Redirect($"/login?error={encodedError}");
             }
-            
+
             return Results.Redirect("/profile");
         });
 
-        group.MapPost("/logout", [IgnoreAntiforgeryToken] async (HttpContext context) =>
+        group.MapPost("/logout", async (HttpContext context) =>
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Results.Redirect("/");
         });
     }
-} 
+}
