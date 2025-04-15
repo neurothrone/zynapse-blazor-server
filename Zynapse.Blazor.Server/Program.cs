@@ -3,19 +3,15 @@ using Microsoft.AspNetCore.Authentication;
 using Zynapse.Blazor.Server.Components;
 using Zynapse.Blazor.Server.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Use default AuthenticationStateProvider (no custom one)
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 
-// Add authentication services
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -28,8 +24,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/";
         options.AccessDeniedPath = "/access-denied";
     });
-
-// Add authorization services
 builder.Services.AddAuthorization();
 
 // Configure Firebase
@@ -49,7 +43,6 @@ builder.Services.AddScoped(provider => new FirebaseAuthService(
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -60,7 +53,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication(); // <- This must come before UseAuthorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseAntiforgery();
@@ -86,12 +79,9 @@ app.MapPost("/login-user", async (
     var (success, errorMessage) =
         await authService.SignInWithEmailAndPasswordAsync(email!, password!);
 
-    if (!success)
-    {
-        return Results.BadRequest(errorMessage ?? "Invalid credentials.");
-    }
-
-    return Results.Redirect("/profile");
+    return !success
+        ? Results.BadRequest(errorMessage ?? "Invalid credentials.")
+        : Results.Redirect("/profile");
 });
 
 app.MapPost("/logout-user", async (HttpContext context) =>
@@ -104,5 +94,3 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-
-public record LoginRequest(string Email, string Password);
