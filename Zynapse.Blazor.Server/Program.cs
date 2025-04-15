@@ -1,9 +1,6 @@
-using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authentication;
 using Zynapse.Blazor.Server.Components;
 using Zynapse.Blazor.Server.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Web;
 using Zynapse.Blazor.Server.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddAntiforgery();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -57,7 +55,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseAntiforgery();
 
 app.MapAuthEndpoints();

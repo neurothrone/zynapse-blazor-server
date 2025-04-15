@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -14,21 +13,10 @@ public static class AuthEndpoints
     {
         var group = endpoints.MapGroup("/api/auth");
 
-        group.MapPost("/register", async (
-            HttpContext context,
-            IAntiforgery antiforgery,
+        group.MapPost("/register", [IgnoreAntiforgeryToken] async (
             FirebaseAuthService authService,
             [FromForm] RegisterModel model) =>
         {
-            try
-            {
-                await antiforgery.ValidateRequestAsync(context);
-            }
-            catch (AntiforgeryValidationException)
-            {
-                return Results.Redirect("/register?error=Invalid+or+missing+antiforgery+token");
-            }
-
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.ConfirmPassword))
             {
                 return Results.Redirect("/register?error=Email,+password,+and+confirm+password+are+required");
@@ -51,21 +39,10 @@ public static class AuthEndpoints
             return Results.Redirect("/profile");
         });
 
-        group.MapPost("/login", async (
-            HttpContext context,
-            IAntiforgery antiforgery,
+        group.MapPost("/login", [IgnoreAntiforgeryToken] async (
             FirebaseAuthService authService,
             [FromForm] LoginModel model) =>
         {
-            try
-            {
-                await antiforgery.ValidateRequestAsync(context);
-            }
-            catch (AntiforgeryValidationException)
-            {
-                return Results.Redirect("/login?error=Invalid+or+missing+antiforgery+token");
-            }
-
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
                 return Results.Redirect("/login?error=Email+and+password+are+required");
@@ -83,7 +60,7 @@ public static class AuthEndpoints
             return Results.Redirect("/profile");
         });
 
-        group.MapPost("/logout", async (HttpContext context) =>
+        group.MapPost("/logout", [IgnoreAntiforgeryToken] async (HttpContext context) =>
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Results.Redirect("/");
