@@ -1,4 +1,4 @@
-@page "/login"
+@page "/register"
 @using Microsoft.AspNetCore.Antiforgery
 @using Zynapse.Blazor.Server.Services
 @using Zynapse.Blazor.Server.Models
@@ -7,17 +7,17 @@
 @inject FirebaseAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Login - Zynapse</PageTitle>
+<PageTitle>Register - Zynapse</PageTitle>
 
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3>Login</h3>
+                    <h3>Create Account</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/login-user">
+                    <form method="post" action="/register-user">
                         @if (!string.IsNullOrEmpty(_errorMessage))
                         {
                             <div class="alert alert-danger mb-3">
@@ -29,19 +29,24 @@
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" name="Email" class="form-control" required value="@_loginModel.Email" 
-                                   @onchange="@(e => _loginModel.Email = e.Value?.ToString() ?? string.Empty)" />
+                            <input type="email" id="email" name="Email" class="form-control" required value="@_registerModel.Email"
+                                   @onchange="@(e => _registerModel.Email = e.Value?.ToString() ?? string.Empty)" />
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" id="password" name="Password" class="form-control" required minlength="6" value="@_loginModel.Password"
-                                   @onchange="@(e => _loginModel.Password = e.Value?.ToString() ?? string.Empty)" />
+                            <input type="password" id="password" name="Password" class="form-control" required minlength="6" value="@_registerModel.Password"
+                                   @onchange="@(e => _registerModel.Password = e.Value?.ToString() ?? string.Empty)" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="ConfirmPassword" class="form-control" required minlength="6" value="@_registerModel.ConfirmPassword"
+                                   @onchange="@(e => _registerModel.ConfirmPassword = e.Value?.ToString() ?? string.Empty)" />
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary" type="submit">Login</button>
+                            <button class="btn btn-primary" type="submit">Register</button>
                         </div>
                         <div class="mt-3 text-center">
-                            <p>Don't have an account? <a href="/register">Register here</a></p>
+                            <p>Already have an account? <a href="/login">Login here</a></p>
                         </div>
                     </form>
                 </div>
@@ -51,7 +56,7 @@
 </div>
 
 @code {
-    private LoginModel _loginModel = new();
+    private RegisterModel _registerModel = new();
     private string? _errorMessage;
     
     [Inject]
@@ -74,4 +79,4 @@
             _errorMessage = HttpUtility.UrlDecode(errorValue);
         }
     }
-}
+} 
