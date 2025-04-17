@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Zynapse.Blazor.Server.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Firebase.Auth;
@@ -119,7 +118,7 @@ public class FirebaseAuthService
         }
     }
 
-    private string GetUserFriendlyErrorMessage(FirebaseAuthException ex)
+    private static string GetUserFriendlyErrorMessage(FirebaseAuthException ex)
     {
         return ex.Reason switch
         {
