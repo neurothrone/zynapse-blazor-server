@@ -5,7 +5,6 @@
 
 # Sensitive files
 appsettings.json
-firebase-service-account.json
 
 # dotenv files
 .env
