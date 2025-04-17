@@ -16,19 +16,19 @@
                 <div class="card-body">
                     <AuthorizeView>
                         <Authorized>
-                            @if (IsLoaded)
+                            @if (_isLoaded)
                             {
                                 <div class="mb-3">
                                     <label class="form-label">Email</label>
-                                    <input type="text" class="form-control" value="@Email" readonly/>
+                                    <input type="text" class="form-control" value="@_email" readonly/>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Display Name</label>
-                                    <input type="text" class="form-control" value="@DisplayName" readonly/>
+                                    <input type="text" class="form-control" value="@_displayName" readonly/>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">User ID</label>
-                                    <input type="text" class="form-control" value="@UserId" readonly/>
+                                    <input type="text" class="form-control" value="@_userId" readonly/>
                                 </div>
                             }
                             else
@@ -51,10 +51,10 @@
 </div>
 
 @code {
-    private bool IsLoaded = false;
-    private string Email = string.Empty;
-    private string DisplayName = string.Empty;
-    private string UserId = string.Empty;
+    private bool _isLoaded;
+    private string _email = string.Empty;
+    private string _displayName = string.Empty;
+    private string _userId = string.Empty;
 
     [Inject]
     private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
@@ -66,11 +66,12 @@
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            Email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? "";
-            DisplayName = user.FindFirst(c => c.Type == ClaimTypes.Name)?.Value ?? "";
-            UserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+            _email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
+            _displayName = user.FindFirst(c => c.Type == ClaimTypes.Name)?.Value ?? string.Empty;
+            _userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
 
-        IsLoaded = true;
+        _isLoaded = true;
     }
+
 }
