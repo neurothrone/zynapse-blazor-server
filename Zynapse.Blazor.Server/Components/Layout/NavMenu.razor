@@ -12,19 +12,18 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <a class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
-            </a>
+            </NavLink>
         </div>
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
-                    <a class="nav-link" href="profile">
+                    <NavLink class="nav-link" href="profile" Match="NavLinkMatch.Prefix">
                         <span class="oi oi-person" aria-hidden="true"></span> Profile
-                    </a>
+                    </NavLink>
                 </div>
                 <div class="nav-item px-3">
-
                     <form method="post" action="/api/auth/logout">
                         <button type="submit" class="nav-link btn btn-link">Logout</button>
                     </form>
@@ -32,9 +31,9 @@
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
-                    <a class="nav-link" href="login">
+                    <NavLink class="nav-link" href="login" Match="NavLinkMatch.Prefix">
                         <span class="oi oi-account-login" aria-hidden="true"></span> Login
-                    </a>
+                    </NavLink>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
@@ -44,7 +43,7 @@
 @code {
     private bool _collapseNavMenu = true;
 
-    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : "";
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : string.Empty;
 
     private void ToggleNavMenu()
     {
