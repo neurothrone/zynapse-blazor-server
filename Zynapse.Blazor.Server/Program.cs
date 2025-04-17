@@ -1,7 +1,7 @@
 using Zynapse.Blazor.Server.Components;
+using Zynapse.Blazor.Server.Endpoints;
 using Zynapse.Blazor.Server.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Zynapse.Blazor.Server.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
