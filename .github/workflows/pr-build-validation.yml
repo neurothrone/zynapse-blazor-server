@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "src/**"
+      - "**/*.sln"
 
 jobs:
   build:
@@ -22,10 +23,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore src/Zynapse.Blazor.sln
+        run: dotnet restore Zynapse.Blazor.sln
 
       - name: Build solution
-        run: dotnet build src/Zynapse.Blazor.sln --no-restore --configuration Release
+        run: dotnet build Zynapse.Blazor.sln --no-restore --configuration Release
 
 #      - name: Run tests
 #        run: dotnet test src/Zynapse.Blazor.Tests/Zynapse.Blazor.Tests.csproj --no-build --configuration Release --verbosity normal
