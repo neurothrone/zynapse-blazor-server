@@ -1,0 +1,31 @@
+name: PR Build Validation
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths:
+      - "src/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore src/Zynapse.Blazor.sln
+
+      - name: Build solution
+        run: dotnet build src/Zynapse.Blazor.sln --no-restore --configuration Release
+
+#      - name: Run tests
+#        run: dotnet test src/Zynapse.Blazor.Tests/Zynapse.Blazor.Tests.csproj --no-build --configuration Release --verbosity normal

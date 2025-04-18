@@ -5,6 +5,15 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zynapse.Blazor.Server", "Zynapse.Blazor.Server\Zynapse.Blazor.Server.csproj", "{6A959807-9F7D-4AD7-8B52-03C873FFE049}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{332AB59A-8F36-43B4-982D-7B3206C45BE2}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = ../.gitignore
+								pr-build-validation.yml = ../.github/workflows/pr-build-validation.yml
+								README.md = ../README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{41636272-8025-46A1-9CCB-4B4CE48E7BC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +27,8 @@ Global
 		{6A959807-9F7D-4AD7-8B52-03C873FFE049}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A959807-9F7D-4AD7-8B52-03C873FFE049}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A959807-9F7D-4AD7-8B52-03C873FFE049}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6A959807-9F7D-4AD7-8B52-03C873FFE049} = {41636272-8025-46A1-9CCB-4B4CE48E7BC5}
 	EndGlobalSection
 EndGlobal
