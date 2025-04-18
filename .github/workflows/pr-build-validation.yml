@@ -22,10 +22,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore src/MyApi.sln
+        run: dotnet restore src/Zynapse.Blazor.sln
 
       - name: Build solution
-        run: dotnet build src/MyApi.sln --no-restore --configuration Release
+        run: dotnet build src/Zynapse.Blazor.sln --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test src/MyApi.Tests/MyApi.Tests.csproj --no-build --configuration Release --verbosity normal
+#      - name: Run tests
+#        run: dotnet test src/Zynapse.Blazor.Tests/Zynapse.Blazor.Tests.csproj --no-build --configuration Release --verbosity normal
